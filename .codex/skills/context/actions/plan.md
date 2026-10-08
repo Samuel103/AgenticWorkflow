@@ -1,6 +1,6 @@
 ## Purpose
 
-Turn the work item loaded in `context/current-context.md` into a clear, ordered, and explicitly approved implementation plan. Planning must take place in Codex or Copilot Plan mode. After approval, let the user choose how the plan is stored.
+Turn the request loaded in `context/current-context.md` into a clear, ordered, and explicitly approved implementation plan in `context/steps/01-implementation-plan.md`. Planning must take place in Codex or Copilot Plan mode.
 
 ## Required Codex or Copilot mode
 
@@ -12,10 +12,10 @@ Turn the work item loaded in `context/current-context.md` into a clear, ordered,
 
 ## Preconditions
 
-- `context/current-context.md` must describe a specific work item.
+- `context/current-context.md` must describe a specific request.
 - The objective and request must contain enough information to plan the work responsibly.
-- The work item must provide enough acceptance criteria or expected outcomes to determine when implementation is complete.
-- If the work item is a bug or defect, its `## Bug investigation` section must contain completed findings from `/context investigate`, including evidence and a root cause or clearly labeled hypothesis. A template, `Not performed`, `Blocked`, or otherwise incomplete investigation does not satisfy this precondition.
+- The request must provide enough acceptance criteria or expected outcomes to determine when implementation is complete.
+- Include any necessary analysis or verification before dependent implementation steps. If its outcome could materially change the proposed solution, make that a stopping point and obtain approval for a revised plan before continuing.
 - If essential information is missing or contradictory, present it to the user under `Open questions` and stop before drafting speculative steps. Do not modify any file while waiting for the answers.
 
 ## Workflow
@@ -27,20 +27,16 @@ Turn the work item loaded in `context/current-context.md` into a clear, ordered,
 5. Draft the complete solution. It must satisfy the objective, requirements, and acceptance criteria, and must distinguish confirmed decisions from assumptions.
 6. Present the draft in the plan structure defined below. Do not write it to a file yet.
 7. Ask the user either to approve the plan explicitly or request changes. Apply requested changes and present the revised plan for approval. Approval must be an unambiguous affirmative response; silence or a request for changes is not approval.
-8. After approval, ask the user to choose exactly one storage format:
-   - **Multiple step files:** one ordered Markdown file per independently implementable step in `context/steps/`.
-   - **Single plan file:** the complete plan in one Markdown file in `context/steps/`.
-   - **Current context:** an `## Implementation plan` section in `context/current-context.md`.
-9. Use a structured user-input control for the storage choice when one is available; otherwise ask one concise question listing the three choices.
-10. Persist only the approved plan in the selected format. Do not revise its scope while storing it.
-11. Report the exact path of every file written and the `/context implement <spec>` invocation for each implementation target.
+8. Check whether `context/steps/01-implementation-plan.md` already exists. If it does, show the collision and get explicit approval before replacing it.
+9. Write only the approved plan to `context/steps/01-implementation-plan.md`. Do not revise its scope while storing it.
+10. Report the plan path and the `/context implement` command.
 
 ## Plan structure
 
-Every plan, whether displayed in the conversation or written to a file, must contain:
+The plan, whether displayed in the conversation or written to the file, must contain:
 
 1. **Objective:** the implementation outcome.
-2. **Confirmed decisions:** requirements and choices established by the work item or the user.
+2. **Confirmed decisions:** requirements and choices established by the request or the user.
 3. **Assumptions:** non-confirmed details used by the plan. Use `None` when there are none.
 4. **Affected areas:** expected components, files, integrations, and tests.
 5. **Implementation steps:** ordered, independently verifiable changes.
@@ -58,35 +54,15 @@ Each step in **Implementation steps** must include:
 
 ## Storage contract
 
-### Multiple step files
-
-- Create files in implementation order using `NN-<kebab-case-step-title>.md`, starting with `01` (for example, `01-add-domain-model.md`).
-- Each file must be independently actionable and use the plan structure above, scoped to that step.
-- Express cross-step dependencies using the exact filenames.
-- The implementation target is the exact relative path, for example `/context implement context/steps/01-add-domain-model.md`.
-
-### Single plan file
-
-- Write the plan to `context/steps/01-implementation-plan.md`.
-- The implementation target is `/context implement context/steps/01-implementation-plan.md`.
-
-### Current context
-
-- Add or replace one `## Implementation plan` section in `context/current-context.md`.
-- Preserve every other section in the file.
-- The implementation target is `/context implement current-context`.
-
-### Existing targets
-
-- Never silently overwrite an existing plan file or an existing `## Implementation plan` section.
-- If a selected target already exists, show the collision and ask the user whether to replace it or choose another storage format or filename.
-- Do not delete stale step files unless the user explicitly asks for their removal.
+- Store the complete approved plan in `context/steps/01-implementation-plan.md`.
+- Never silently overwrite that file. If it exists, get explicit approval before replacing it.
+- Do not delete other files in `context/steps/` unless the user explicitly asks for their removal.
 
 ## Mode and write limitations
 
-If the active Plan mode does not permit file edits, keep the approved plan and storage choice in the conversation and tell the user which target path or section would be written. Ask the user to exit Plan mode and run `/context plan persist` in the same conversation. This is the sole exception to the Plan-mode gate. During the persistence pass:
+If the active Plan mode does not permit file edits, keep the approved plan in the conversation and tell the user that it will be written to `context/steps/01-implementation-plan.md`. Ask the user to exit Plan mode and run `/context plan persist` in the same conversation. This is the sole exception to the Plan-mode gate. During the persistence pass:
 
-- Use only the explicitly approved plan and storage choice already present in the conversation.
+- Use only the explicitly approved plan already present in the conversation.
 - Do not inspect additional repository files, regenerate the plan, or revise its scope.
-- If the approved plan or storage choice is not available in the conversation, stop and require the user to return to Plan mode.
-- Check for existing-target collisions, write the approved content, and report the resulting implementation target.
+- If the approved plan is not available in the conversation, stop and require the user to return to Plan mode.
+- Check whether the target file exists. If replacement was not already approved in the conversation, get explicit approval before replacing it. Write the approved content and report `/context implement`.

@@ -1,19 +1,14 @@
 # Implement an approved context plan
 
-Use this action for `/context implement <spec>`.
+Use this action for `/context implement`.
 
 ## Input
 
-Resolve `<spec>` as follows:
-
-- An exact Markdown path: use that file.
-- `current-context`: use `context/current-context.md` from the repository root.
-
-Do not guess between multiple possible specification files. If the supplied file does not exist, stop and report the unresolved path.
+Read the approved plan from `context/steps/01-implementation-plan.md` at the repository root. If the file does not exist, stop and report the missing plan.
 
 ## Preconditions
 
-1. Read the resolved specification completely.
+1. Read `context/steps/01-implementation-plan.md` completely.
 2. Read the repository instructions that apply to every file the plan may change.
 3. Confirm that the specification contains an implementation plan and that the user approved that plan in the current conversation or the specification records its approved status.
 4. Inspect the working tree and the code directly relevant to the planned changes.
